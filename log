@@ -1,0 +1,34 @@
+# basecalling
+# dziala na probnych danych chirona i na naszych
+chiron call -i fast5/ -o chiron_call_output
+
+# przygotowanie danych do trenowania
+# na podstawie danych uzywanych przez chirona
+
+cut -d' ' -f3 Lambda_0001.label | tr "\n" " " | tr -d " " > lambda_read.fa
+
+# fake'owe quality scores
+cat lambda_read.fa lambda_read.fa >> Read_1.fastq
+
+# recznie dostosowalam ID: w pierwszej linii zaczyna się od @, w trzeciej od +
+
+python create_test_read.py
+
+# !musialam pozmieniac kody zrodlowe dla tych dwoch komend
+tombo preprocess annotate_raw_with_fastqs --fast5-basedir lambda_test/ --fastq-filenames Read_1.fastq 
+tombo resquiggle lambda_test/ lambda_ref.fa 
+
+# nie da sie bezposrednio chironem, wywala sie
+python2 /usr/local/lib/python2.7/dist-packages/chiron/utils/file_batch.py -i lambda_test/ -o lambda_test_out --mode dna --length 200
+
+# j.w.
+# to nie generuje zadnych plikow bin jak twierdzi github
+# ale dziala
+python2 /usr/local/lib/python2.7/dist-packages/chiron/utils/raw.py -i lambda_test/ -o lambda_test_out --mode dna
+
+# !trzeba poprawic chiron_input.py:553, usunac indeksowanie [2] (jest dobry skrypt w katalogu chiron)
+# max_stes jest nieduzy bo to i tak masakrycznie przegrzewa laptopa i raz juz sie wylaczyl
+python2 /usr/local/lib/python2.7/dist-packages/chiron/chiron_rcnn_train.py -i lambda_test_out -o lambda_test_out_model -m lambda_model -f train.tfrecords --max_steps 60
+
+# po wygenerowaniu modelu mozna za jego pomoca zrobic basecalling
+chiron call -i lambda_fast5_cut -o lambda_calls_with_15seqs_model -m lambda_model/lambda_9seqs_model/
