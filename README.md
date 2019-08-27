@@ -5,6 +5,13 @@ W log są wszystkie komendy, które są potrzebne żeby:
 - zrobić basecalling chironem z własnym modelem
 *Uwaga: żeby niektóre zadziałały trzeba wprowadzić zmiany w kodach źródłowych chirona i tombo.*
 
+`requirements\_tombo.txt` i `requirements\_chiron.txt`
+ to requirements dla których tombo i chiron na pewno działają,
+ aczkolwiek na pewno nie minimalne.
+ Chiron dostarcza własny plik requirements, wydaje mi się że on jest ok.
+ Tombo przede wszystkim wymaga żeby najpierw zainstalować numpy.
+ *Ważne: tombo działa na pythonie 3.6, chiron na 2.7.*
+
 Model trenowałam i testowałam na odczytach faga lambda,
  tych samych, których używał chiron.
  (Basecalling testowałam też na naszych, działa).
